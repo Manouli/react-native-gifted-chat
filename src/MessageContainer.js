@@ -11,10 +11,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { FlatList, View, StyleSheet, Keyboard, TouchableOpacity, Text } from 'react-native';
-
-import LoadEarlier from './LoadEarlier';
-import Message from './Message';
-import Color from './Color';
+import {
+  LoadEarlier,
+  Message,
+} from 'react-native-gifted-chat';
 
 export default class MessageContainer extends React.Component {
 
@@ -31,33 +31,46 @@ export default class MessageContainer extends React.Component {
   shouldComponentUpdate(nextProps) {
     const next = nextProps.messages;
     const current = this.props.messages;
-    return (
-      next.length !== current.length || next.extraData !== current.extraData || next.loadEarlier !== current.loadEarlier
+
+    return (next[0]?.loader !== current[0]?.loader ||
+      next.length !== current.length ||
+      next.extraData !== current.extraData ||
+      next.loadEarlier !== current.loadEarlier
     );
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.messages.length === 0 && nextProps.messages.length > 0) {
+    const { messages } = this.props;
+
+    if (messages.length === 0 && nextProps.messages.length > 0) {
       this.detachKeyboardListeners();
-    } else if (this.props.messages.length > 0 && nextProps.messages.length === 0) {
+    } else if (messages.length > 0 && nextProps.messages.length === 0) {
       this.attachKeyboardListeners(nextProps);
     }
   }
 
   attachKeyboardListeners = () => {
     const { invertibleScrollViewProps: invertibleProps } = this.props;
-    Keyboard.addListener('keyboardWillShow', invertibleProps.onKeyboardWillShow);
+
+    Keyboard
+      .addListener('keyboardWillShow', invertibleProps.onKeyboardWillShow);
     Keyboard.addListener('keyboardDidShow', invertibleProps.onKeyboardDidShow);
-    Keyboard.addListener('keyboardWillHide', invertibleProps.onKeyboardWillHide);
+    Keyboard
+      .addListener('keyboardWillHide', invertibleProps.onKeyboardWillHide);
     Keyboard.addListener('keyboardDidHide', invertibleProps.onKeyboardDidHide);
   };
 
   detachKeyboardListeners = () => {
     const { invertibleScrollViewProps: invertibleProps } = this.props;
-    Keyboard.removeListener('keyboardWillShow', invertibleProps.onKeyboardWillShow);
-    Keyboard.removeListener('keyboardDidShow', invertibleProps.onKeyboardDidShow);
-    Keyboard.removeListener('keyboardWillHide', invertibleProps.onKeyboardWillHide);
-    Keyboard.removeListener('keyboardDidHide', invertibleProps.onKeyboardDidHide);
+
+    Keyboard
+      .removeListener('keyboardWillShow', invertibleProps.onKeyboardWillShow);
+    Keyboard
+      .removeListener('keyboardDidShow', invertibleProps.onKeyboardDidShow);
+    Keyboard
+      .removeListener('keyboardWillHide', invertibleProps.onKeyboardWillHide);
+    Keyboard
+      .removeListener('keyboardDidHide', invertibleProps.onKeyboardDidHide);
   };
 
   renderFooter = () => {
@@ -105,10 +118,12 @@ export default class MessageContainer extends React.Component {
     if (!item._id && item._id !== 0) {
       console.warn('GiftedChat: `_id` is missing for message', JSON.stringify(item));
     }
+
     if (!item.user) {
       if (!item.system) {
         console.warn('GiftedChat: `user` is missing for message', JSON.stringify(item));
       }
+
       item.user = {};
     }
     const { messages, ...restProps } = this.props;
@@ -130,12 +145,18 @@ export default class MessageContainer extends React.Component {
     return <Message {...messageProps} />;
   };
 
-  renderHeaderWrapper = () => <View style={styles.headerWrapper}>{this.renderLoadEarlier()}</View>;
+  renderHeaderWrapper = () =>
+    <View style={styles.headerWrapper}>{this.renderLoadEarlier()}</View>;
 
   renderScrollToBottomWrapper() {
     const scrollToBottomComponent = (
       <View style={styles.scrollToBottomStyle}>
-        <TouchableOpacity onPress={this.scrollToBottom} hitSlop={{ top: 5, left: 5, right: 5, bottom: 5 }}>
+        <TouchableOpacity
+          onPress={this.scrollToBottom}
+          hitSlop={{
+            top: 5, left: 5, right: 5, bottom: 5,
+          }}
+        >
           <Text>V</Text>
         </TouchableOpacity>
       </View>
@@ -143,14 +164,19 @@ export default class MessageContainer extends React.Component {
 
     if (this.props.scrollToBottomComponent) {
       return (
-        <TouchableOpacity onPress={this.scrollToBottom} hitSlop={{ top: 5, left: 5, right: 5, bottom: 5 }}>
+        <TouchableOpacity
+          onPress={this.scrollToBottom}
+          hitSlop={{
+            top: 5, left: 5, right: 5, bottom: 5,
+          }}
+        >
           {this.props.scrollToBottomComponent}
         </TouchableOpacity>);
     }
     return scrollToBottomComponent;
   }
 
-  keyExtractor = (item) => `${item._id}`;
+  keyExtractor = item => `${item._id}`;
 
   render() {
     if (this.props.messages.length === 0) {
@@ -158,9 +184,14 @@ export default class MessageContainer extends React.Component {
     }
     return (
       <View style={styles.container}>
-        {this.state.showScrollBottom && this.props.scrollToBottom ? this.renderScrollToBottomWrapper() : null}
+        {
+          this.state.showScrollBottom && this.props.scrollToBottom
+            ? this.renderScrollToBottomWrapper()
+            : null
+        }
+
         <FlatList
-          ref={(ref) => (this.flatListRef = ref)}
+          ref={ref => (this.flatListRef = ref)}
           extraData={this.props.extraData}
           keyExtractor={this.keyExtractor}
           enableEmptySections
@@ -180,7 +211,6 @@ export default class MessageContainer extends React.Component {
       </View>
     );
   }
-
 }
 
 const styles = StyleSheet.create({
@@ -207,10 +237,10 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
     borderRadius: 20,
-    backgroundColor: Color.white,
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: Color.black,
+    shadowColor: 'black',
     shadowOpacity: 0.5,
     shadowOffset: { width: 0, height: 0 },
     shadowRadius: 1,
